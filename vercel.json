@@ -3,13 +3,6 @@
   "name": "linkedin-content-platform",
   "buildCommand": "cd backend && npm install && npx prisma generate",
   "installCommand": "cd backend && npm install",
-  "functions": {
-    "api/**/*.ts": {
-      "runtime": "@vercel/node",
-      "maxDuration": 30,
-      "includeFiles": "backend/**"
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }

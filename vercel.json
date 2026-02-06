@@ -1,7 +1,7 @@
 {
   "version": 2,
   "name": "linkedin-content-platform",
-  "buildCommand": "cd backend && npm install && npx prisma generate",
+  "buildCommand": "cd backend && npm install && npx -y prisma generate",
   "installCommand": "cd backend && npm install",
   "env": {
     "NODE_ENV": "production"

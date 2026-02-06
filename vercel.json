@@ -3,26 +3,6 @@
   "name": "linkedin-content-platform",
   "buildCommand": "cd backend && npm install && node node_modules/prisma/build/index.js generate",
   "installCommand": "cd backend && npm install",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "env": {
     "NODE_ENV": "production"
   }

@@ -5,12 +5,10 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layouts
+// Layouts
 import DashboardLayout from './layouts/DashboardLayout';
-import AuthLayout from './layouts/AuthLayout';
 
 // Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Personas from './pages/Personas';
 import PersonaCreate from './pages/PersonaCreate';
@@ -21,9 +19,6 @@ import CompetitorAnalysis from './pages/CompetitorAnalysis';
 import ProfileAudit from './pages/ProfileAudit';
 import Settings from './pages/Settings';
 import ImageGenerator from './pages/ImageGenerator';
-
-// Components
-import ProtectedRoute from './components/ProtectedRoute';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,27 +36,19 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* Auth Routes */}
-              <Route element={<AuthLayout />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-              </Route>
-
-              {/* Protected Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route element={<DashboardLayout />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/personas" element={<Personas />} />
-                  <Route path="/personas/create" element={<PersonaCreate />} />
-                  <Route path="/personas/edit/:id" element={<PersonaCreate />} />
-                  <Route path="/content/studio" element={<ContentStudio />} />
-                  <Route path="/content/history" element={<ContentHistory />} />
-                  <Route path="/trends" element={<TrendExplorer />} />
-                  <Route path="/competitors" element={<CompetitorAnalysis />} />
-                  <Route path="/audit" element={<ProfileAudit />} />
-                  <Route path="/images" element={<ImageGenerator />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Route>
+              {/* Main App Routes */}
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/personas" element={<Personas />} />
+                <Route path="/personas/create" element={<PersonaCreate />} />
+                <Route path="/personas/edit/:id" element={<PersonaCreate />} />
+                <Route path="/content/studio" element={<ContentStudio />} />
+                <Route path="/content/history" element={<ContentHistory />} />
+                <Route path="/trends" element={<TrendExplorer />} />
+                <Route path="/competitors" element={<CompetitorAnalysis />} />
+                <Route path="/audit" element={<ProfileAudit />} />
+                <Route path="/images" element={<ImageGenerator />} />
+                <Route path="/settings" element={<Settings />} />
               </Route>
 
               {/* Redirect */}

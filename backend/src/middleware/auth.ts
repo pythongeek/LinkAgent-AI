@@ -24,7 +24,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         error: {
@@ -35,7 +35,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.substring(7);
-    
+
     if (!token) {
       return res.status(401).json({
         error: {
@@ -45,9 +45,19 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       });
     }
 
+    // DEMO TOKEN BYPASS
+    if (token === 'demo-token') {
+      req.user = {
+        id: 'demo-user-id',
+        email: 'demo@example.com',
+        name: 'Demo User',
+      };
+      return next();
+    }
+
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-    
+
     // Fetch user from database
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
@@ -68,7 +78,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     next();
   } catch (error) {
     logger.error('Auth middleware error:', error);
-    
+
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({
         error: {
@@ -94,14 +104,14 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 export const optionalAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return next();
     }
 
     const token = authHeader.substring(7);
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-    
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: { id: true, email: true, name: true },
@@ -110,7 +120,7 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     if (user) {
       req.user = user;
     }
-    
+
     next();
   } catch (error) {
     // Silently continue without user

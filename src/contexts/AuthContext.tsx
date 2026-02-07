@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { api } from '../services/api';
+
 import { toast } from 'sonner';
 
 interface User {
@@ -32,15 +32,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     linkedinConnected: false,
   };
 
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [isLoading, setIsLoading] = useState(false);
+  const [user] = useState<User | null>(mockUser);
+  const [isLoading] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('token', 'demo-token');
+  }, []);
 
   // No-op functions for auth actions
-  const login = async (email: string, password: string) => {
+  const login = async (_email: string, _password: string) => {
     toast.success('Welcome back! (Demo Mode)');
   };
 
-  const register = async (email: string, password: string, name: string) => {
+  const register = async (_email: string, _password: string, _name: string) => {
     toast.success('Account created! (Demo Mode)');
   };
 

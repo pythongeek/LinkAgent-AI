@@ -161,5 +161,3 @@ process.on('SIGINT', async () => {
   if (redis) await redis.quit();
   process.exit(0);
 });
-
-export default app;

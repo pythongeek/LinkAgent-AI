@@ -307,7 +307,7 @@ Return the edited content in the same JSON format with improvements noted.`;
    */
   private async factCheckAgent(content: any, sources: any[]): Promise<any> {
     try {
-      const model = genAI.getGenerativeAI({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
       const prompt = `Fact-check this LinkedIn content:
 

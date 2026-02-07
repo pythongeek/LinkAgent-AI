@@ -71,7 +71,7 @@ router.get('/alerts', authenticate, async (req, res) => {
  */
 router.put('/alerts/:id/read', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     await prisma.topicAlert.updateMany({
       where: {

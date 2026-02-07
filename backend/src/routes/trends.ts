@@ -42,7 +42,7 @@ router.post('/analyze', authenticate, validateBody(trendAnalysisSchema), async (
       data: {
         query: cacheKey,
         queryType: 'trends',
-        results,
+        results: results as any,
         source: 'google_trends',
         expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000),
       },
@@ -164,7 +164,7 @@ router.post('/compare', authenticate, async (req, res) => {
  */
 router.get('/interest/:topic', authenticate, async (req, res) => {
   try {
-    const { topic } = req.params;
+    const topic = req.params.topic as string;
     const { timeframe = 'today 12-m' } = req.query;
 
     const analyzer = new TrendAnalyzer();
@@ -191,7 +191,7 @@ router.get('/interest/:topic', authenticate, async (req, res) => {
  */
 router.get('/related/:topic', authenticate, async (req, res) => {
   try {
-    const { topic } = req.params;
+    const topic = req.params.topic as string;
 
     const analyzer = new TrendAnalyzer();
     const related = await analyzer.getRelatedQueries(topic);

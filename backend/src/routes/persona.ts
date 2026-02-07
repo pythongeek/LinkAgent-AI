@@ -37,7 +37,7 @@ router.get('/', authenticate, async (req, res) => {
  */
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const persona = await prisma.persona.findFirst({
       where: {
@@ -118,7 +118,7 @@ router.post('/', authenticate, validateBody(personaSchema), async (req, res) => 
  */
 router.put('/:id', authenticate, validateBody(personaSchema), async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const data = req.body;
     const userId = req.user!.id;
 
@@ -178,7 +178,7 @@ router.put('/:id', authenticate, validateBody(personaSchema), async (req, res) =
  */
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const userId = req.user!.id;
 
     // Check if persona exists and belongs to user
@@ -221,7 +221,7 @@ router.delete('/:id', authenticate, async (req, res) => {
  */
 router.post('/:id/default', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const userId = req.user!.id;
 
     // Check if persona exists and belongs to user
@@ -273,7 +273,7 @@ router.post('/:id/default', authenticate, async (req, res) => {
  */
 router.post('/:id/preview', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { sampleTopic } = req.body;
     const userId = req.user!.id;
 

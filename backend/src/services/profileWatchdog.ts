@@ -34,9 +34,6 @@ export class ProfileWatchdogService {
         where: {
           linkedinCookies: { not: null },
         },
-        include: {
-          linkedinProfile: true,
-        },
       });
 
       logger.info(`[Profile Watchdog] Auditing ${users.length} users`);

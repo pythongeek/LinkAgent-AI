@@ -20,7 +20,7 @@ router.post('/analyze', authenticate, validateBody(competitorAnalysisSchema), as
     const userId = req.user!.id;
 
     // Get user's LinkedIn session
-    const session = await prisma.linkedinSession.findUnique({
+    const session = await prisma.linkedInSession.findUnique({
       where: { userId },
     });
 
@@ -51,12 +51,12 @@ router.post('/analyze', authenticate, validateBody(competitorAnalysisSchema), as
     const topicRecord = await prisma.topic.upsert({
       where: { keyword: topic.toLowerCase() },
       update: {
-        competitionData: analysis,
+        competitionData: analysis as any,
         lastAnalyzed: new Date(),
       },
       create: {
         keyword: topic.toLowerCase(),
-        competitionData: analysis,
+        competitionData: analysis as any,
         lastAnalyzed: new Date(),
       },
     });
@@ -98,7 +98,7 @@ router.post('/analyze', authenticate, validateBody(competitorAnalysisSchema), as
  */
 router.get('/gaps/:topic', authenticate, async (req, res) => {
   try {
-    const { topic } = req.params;
+    const topic = req.params.topic as string;
 
     const topicRecord = await prisma.topic.findUnique({
       where: { keyword: topic.toLowerCase() },
@@ -140,7 +140,7 @@ router.get('/gaps/:topic', authenticate, async (req, res) => {
  */
 router.get('/top-performers/:topic', authenticate, async (req, res) => {
   try {
-    const { topic } = req.params;
+    const topic = req.params.topic as string;
     const { limit = '10' } = req.query;
 
     const topicRecord = await prisma.topic.findUnique({

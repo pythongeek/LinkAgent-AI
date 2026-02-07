@@ -197,7 +197,7 @@ router.post('/linkedin', authenticate, validateBody(linkedinCookiesSchema), asyn
     const encryptedJsessionId = Encryption.encrypt(jsessionId);
 
     // Store in database
-    await prisma.linkedinSession.upsert({
+    await prisma.linkedInSession.upsert({
       where: { userId },
       update: {
         liAt: encryptedLiAt,
@@ -247,7 +247,7 @@ router.delete('/linkedin', authenticate, async (req, res) => {
     const userId = req.user!.id;
 
     // Delete session
-    await prisma.linkedinSession.deleteMany({
+    await prisma.linkedInSession.deleteMany({
       where: { userId },
     });
 
@@ -281,7 +281,7 @@ router.get('/linkedin/status', authenticate, async (req, res) => {
   try {
     const userId = req.user!.id;
 
-    const session = await prisma.linkedinSession.findUnique({
+    const session = await prisma.linkedInSession.findUnique({
       where: { userId },
     });
 

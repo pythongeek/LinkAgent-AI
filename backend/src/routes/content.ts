@@ -137,7 +137,7 @@ router.get('/', authenticate, async (req, res) => {
  */
 router.get('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const content = await prisma.content.findFirst({
       where: {
@@ -173,7 +173,7 @@ router.get('/:id', authenticate, async (req, res) => {
  */
 router.put('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { title, body, status, scheduledFor } = req.body;
 
     // Check if content exists and belongs to user
@@ -224,7 +224,7 @@ router.put('/:id', authenticate, async (req, res) => {
  */
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     // Check if content exists and belongs to user
     const existingContent = await prisma.content.findFirst({
@@ -289,7 +289,7 @@ router.post('/suggestions', authenticate, async (req, res) => {
  */
 router.post('/:id/regenerate', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { section, instructions } = req.body;
 
     const content = await prisma.content.findFirst({
@@ -332,7 +332,7 @@ router.post('/:id/regenerate', authenticate, async (req, res) => {
  */
 router.get('/:id/export', authenticate, async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { format = 'text' } = req.query;
 
     const content = await prisma.content.findFirst({

@@ -132,9 +132,10 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
  * Generate JWT token for user
  */
 export const generateToken = (userId: string, email: string): string => {
+  const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
   return jwt.sign(
     { userId, email },
     JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: expiresIn as jwt.SignOptions['expiresIn'] }
   );
 };

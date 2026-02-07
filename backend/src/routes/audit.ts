@@ -19,7 +19,7 @@ router.post('/run', authenticate, validateBody(profileAuditSchema), async (req, 
     const userId = req.user!.id;
 
     // Get user's LinkedIn session
-    const session = await prisma.linkedinSession.findUnique({
+    const session = await prisma.linkedInSession.findUnique({
       where: { userId },
     });
 
@@ -196,7 +196,7 @@ router.post('/about', authenticate, async (req, res) => {
  */
 router.get('/industry-trends/:industry', authenticate, async (req, res) => {
   try {
-    const { industry } = req.params;
+    const industry = req.params.industry as string;
 
     const auditor = new ProfileAuditor();
     const trends = await auditor.getIndustryTrends(industry);

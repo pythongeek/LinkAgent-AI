@@ -1,8 +1,14 @@
 {
   "version": 2,
   "name": "linkedin-content-platform",
-  "buildCommand": "cd backend && npm install && node node_modules/prisma/build/index.js generate",
-  "installCommand": "cd backend && npm install",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "buildCommand": "vite build && npx prisma generate --schema=./backend/prisma/schema.prisma",
+  "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
   }

@@ -30,10 +30,30 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy (required for Vercel + rate-limit)
+app.set('trust proxy', 1);
+
 // Initialize Prisma
 export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
 });
+
+// Run database migrations on startup (for Vercel serverless)
+async function runMigrations() {
+  try {
+    // Check if we can connect to the database
+    await prisma.$connect();
+    logger.info('Database connected successfully');
+    
+    // Note: In production, migrations should be run during build or manually
+    // This ensures the connection works but doesn't run migrations automatically
+    // to avoid conflicts. Run `npx prisma migrate deploy` separately.
+  } catch (error) {
+    logger.error('Database connection failed:', error);
+  }
+}
+
+runMigrations();
 
 // Initialize Redis (optional)
 export const redis = process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) : null;

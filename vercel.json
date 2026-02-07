@@ -7,7 +7,7 @@
       "destination": "/api/index"
     }
   ],
-  "buildCommand": "vite build && npx prisma generate --schema=./backend/prisma/schema.prisma",
+  "buildCommand": "vite build && npx prisma generate --schema=./backend/prisma/schema.prisma && npx prisma migrate deploy --schema=./backend/prisma/schema.prisma",
   "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"

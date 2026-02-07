@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run db:migrate",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:migrate": "prisma migrate deploy --schema=./backend/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=./backend/prisma/schema.prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

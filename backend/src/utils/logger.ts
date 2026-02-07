@@ -27,24 +27,29 @@ export const logger = winston.createLogger({
         process.env.NODE_ENV === 'development' ? devFormat : json()
       ),
     }),
-    // File transport for errors
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
-      format: combine(timestamp(), json()),
-    }),
-    // File transport for all logs
-    new winston.transports.File({
-      filename: 'logs/combined.log',
-      format: combine(timestamp(), json()),
-    }),
+    // File transports (only in development)
+    ...(process.env.NODE_ENV !== 'production'
+      ? [
+        new winston.transports.File({
+          filename: 'logs/error.log',
+          level: 'error',
+          format: combine(timestamp(), json()),
+        }),
+        new winston.transports.File({
+          filename: 'logs/combined.log',
+          format: combine(timestamp(), json()),
+        }),
+      ]
+      : []),
   ],
-  exceptionHandlers: [
-    new winston.transports.File({ filename: 'logs/exceptions.log' }),
-  ],
-  rejectionHandlers: [
-    new winston.transports.File({ filename: 'logs/rejections.log' }),
-  ],
+  exceptionHandlers:
+    process.env.NODE_ENV !== 'production'
+      ? [new winston.transports.File({ filename: 'logs/exceptions.log' })]
+      : [],
+  rejectionHandlers:
+    process.env.NODE_ENV !== 'production'
+      ? [new winston.transports.File({ filename: 'logs/rejections.log' })]
+      : [],
 });
 
 // Stream for Morgan HTTP logging

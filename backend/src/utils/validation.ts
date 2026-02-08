@@ -12,6 +12,7 @@ export const personaSchema = z.object({
     colorScheme: z.string(),
     aesthetics: z.string(),
   }),
+  communicationStyle: z.array(z.string()).optional(),
   isDefault: z.boolean().optional(),
 });
 

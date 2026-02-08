@@ -15,6 +15,7 @@ export interface PersonaData {
     colorScheme: string;
     aesthetics: string;
   };
+  communicationStyle?: string[]; // New: Signature phrases, hooks, closers
 }
 
 export interface PersonaTemplate {
@@ -26,6 +27,53 @@ export interface PersonaTemplate {
 }
 
 export class PersonaService {
+  /**
+   * Analyze voice from a sample text
+   */
+  static async analyzeVoice(sampleText: string): Promise<Partial<PersonaData>> {
+    try {
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+      const prompt = `Analyze this writing sample and extract the persona's voice and style.
+
+SAMPLE:
+"${sampleText.substring(0, 2000)}"
+
+Identify:
+1. Tone (e.g., Analytical, Provocative, Friendly)
+2. Communication style (signature phrases, sentence structure)
+3. Likely job role or expertise
+4. Key themes/topics
+
+Return JSON:
+{
+  "tone": "...",
+  "jobRole": "...",
+  "expertiseNodes": ["...", "..."],
+  "communicationStyle": ["...", "..."],
+  "visualDNA": {
+    "style": "...",
+    "aesthetics": "..."
+  }
+}`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const data = JSON.parse(jsonMatch[0]);
+        // Map tone to closest valid option if possible, or keep as is
+        return data;
+      }
+      return {};
+    } catch (error) {
+      logger.error('Error analyzing voice:', error);
+      return {};
+    }
+  }
+
   /**
    * Generate system prompt from persona data
    * This is the core of the Dynamic Persona Engine
@@ -57,6 +105,7 @@ ${data.experienceVault}
 
 VOICE & TONE:
 ${toneInstructions[data.tone] || toneInstructions.professional}
+${data.communicationStyle ? `\nSIGNATURE STYLE:\n${data.communicationStyle.join('\n')}` : ''}
 
 VISUAL STYLE (for image generation):
 ${visualInstructions[data.visualDNA.style] || visualInstructions.minimalist}

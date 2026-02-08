@@ -37,6 +37,7 @@ model Persona {
   experienceVault String   @map("experience_vault") @db.Text
   tone            String
   visualDNA       Json     @map("visual_dna")
+  communicationStyle String[] @map("communication_style")
   systemPrompt    String   @map("system_prompt") @db.Text
   isDefault       Boolean  @default(false) @map("is_default")
   createdAt       DateTime @default(now()) @map("created_at")

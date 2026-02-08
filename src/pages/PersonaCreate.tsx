@@ -11,7 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Loader2, Plus, X } from 'lucide-react';
+import { Loader2, Plus, X, Wand2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const tones = [
   { value: 'analytical', label: 'Analytical & Direct' },
@@ -44,11 +45,29 @@ export default function PersonaCreate() {
   const [visualStyle, setVisualStyle] = useState('minimalist');
   const [colorScheme, setColorScheme] = useState('Blue and white');
   const [aesthetics, setAesthetics] = useState('Clean and professional');
+  const [communicationStyle, setCommunicationStyle] = useState<string[]>([]);
+  const [newStylePoint, setNewStylePoint] = useState('');
   const [isDefault, setIsDefault] = useState(false);
+  const [sampleText, setSampleText] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalyzeDialogOpen, setIsAnalyzeDialogOpen] = useState(false);
 
   const { isLoading: isLoadingPersona } = useQuery({
     queryKey: ['persona', id],
-    queryFn: () => personaApi.getById(id!).then((res) => res.data.persona),
+    queryFn: () => personaApi.getById(id!).then((res) => {
+        const p = res.data.persona;
+        setName(p.name);
+        setJobRole(p.jobRole);
+        setExpertiseNodes(p.expertiseNodes);
+        setExperienceVault(p.experienceVault);
+        setTone(p.tone);
+        setVisualStyle(p.visualDNA.style);
+        setColorScheme(p.visualDNA.colorScheme);
+        setAesthetics(p.visualDNA.aesthetics);
+        if (p.communicationStyle) setCommunicationStyle(p.communicationStyle);
+        setIsDefault(p.isDefault);
+        return p;
+    }),
     enabled: isEditing,
   });
 
@@ -75,6 +94,65 @@ export default function PersonaCreate() {
     setExpertiseNodes(expertiseNodes.filter((e) => e !== expertise));
   };
 
+  const handleAddStylePoint = () => {
+    if (newStylePoint && !communicationStyle.includes(newStylePoint)) {
+      setCommunicationStyle([...communicationStyle, newStylePoint]);
+      setNewStylePoint('');
+    }
+  };
+
+  const handleRemoveStylePoint = (point: string) => {
+    setCommunicationStyle(communicationStyle.filter((s) => s !== point));
+  };
+
+  const handleAnalyzeVoice = async () => {
+    if (!sampleText || sampleText.length < 50) {
+      toast.error('Please provide at least 50 characters of text to analyze.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const { data } = await personaApi.analyzeVoice(sampleText);
+      const analysis = data.analysis;
+
+      if (analysis.tone) {
+        // Find matching tone or default to professional
+        const matchedTone = tones.find(t => t.value === analysis.tone.toLowerCase())?.value || 'professional';
+        setTone(matchedTone);
+      }
+
+      if (analysis.jobRole) setJobRole(analysis.jobRole);
+
+      if (analysis.expertiseNodes && Array.isArray(analysis.expertiseNodes)) {
+        // Merge new expertise with existing, avoiding duplicates
+        const uniqueExpertise = new Set([...expertiseNodes, ...analysis.expertiseNodes]);
+        setExpertiseNodes(Array.from(uniqueExpertise));
+      }
+
+      if (analysis.communicationStyle && Array.isArray(analysis.communicationStyle)) {
+        const uniqueStyle = new Set([...communicationStyle, ...analysis.communicationStyle]);
+        setCommunicationStyle(Array.from(uniqueStyle));
+      }
+
+      if (analysis.visualDNA) {
+        if (analysis.visualDNA.style) {
+            const matchedStyle = visualStyles.find(s => s.value === analysis.visualDNA.style.toLowerCase())?.value || 'minimalist';
+            setVisualStyle(matchedStyle);
+        }
+        if (analysis.visualDNA.colorScheme) setColorScheme(analysis.visualDNA.colorScheme);
+        if (analysis.visualDNA.aesthetics) setAesthetics(analysis.visualDNA.aesthetics);
+      }
+
+      toast.success('Voice analyzed! Persona updated with detected style.');
+      setIsAnalyzeDialogOpen(false);
+    } catch (error) {
+      toast.error('Failed to analyze voice. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -94,6 +172,7 @@ export default function PersonaCreate() {
         colorScheme,
         aesthetics,
       },
+      communicationStyle,
       isDefault,
     });
   };
@@ -115,6 +194,45 @@ export default function PersonaCreate() {
         <p className="text-muted-foreground">
           Define your AI content persona for authentic LinkedIn posts
         </p>
+      </div>
+
+      <div className="flex justify-end mb-6">
+        <Dialog open={isAnalyzeDialogOpen} onOpenChange={setIsAnalyzeDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Wand2 className="h-4 w-4" />
+              Analyze My Voice
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Analyze Voice & Style</DialogTitle>
+              <DialogDescription>
+                Paste a sample of your writing (LinkedIn post, blog, email) and we'll extract your unique voice.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <Textarea
+                placeholder="Paste your content here..."
+                rows={8}
+                value={sampleText}
+                onChange={(e) => setSampleText(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <Button onClick={handleAnalyzeVoice} disabled={isAnalyzing}>
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  'Analyze & Apply'
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -220,6 +338,35 @@ export default function PersonaCreate() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Signature Style / Hooks</Label>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add style trait (e.g., Starts with a question)"
+                    value={newStylePoint}
+                    onChange={(e) => setNewStylePoint(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddStylePoint())}
+                  />
+                  <Button type="button" onClick={handleAddStylePoint} variant="outline">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {communicationStyle.map((style) => (
+                    <Badge key={style} variant="secondary" className="gap-1">
+                      {style}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveStylePoint(style)}
+                        className="ml-1 hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">

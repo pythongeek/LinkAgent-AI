@@ -271,6 +271,37 @@ router.post('/:id/default', authenticate, async (req, res) => {
  * Preview persona output
  * POST /api/persona/:id/preview
  */
+/**
+ * Analyze voice from sample text
+ * POST /api/persona/analyze-voice
+ */
+router.post('/analyze-voice', authenticate, async (req, res) => {
+  try {
+    const { sampleText } = req.body;
+
+    if (!sampleText || sampleText.length < 50) {
+      return res.status(400).json({
+        error: {
+          message: 'Please provide at least 50 characters of sample text',
+          code: 'VALIDATION_ERROR',
+        },
+      });
+    }
+
+    const analysis = await PersonaService.analyzeVoice(sampleText);
+
+    res.json({ analysis });
+  } catch (error) {
+    logger.error('Analyze voice error:', error);
+    res.status(500).json({
+      error: {
+        message: 'Failed to analyze voice',
+        code: 'INTERNAL_ERROR',
+      },
+    });
+  }
+});
+
 router.post('/:id/preview', authenticate, async (req, res) => {
   try {
     const id = req.params.id as string;

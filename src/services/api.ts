@@ -35,6 +35,7 @@ export const personaApi = {
   delete: (id: string) => api.delete(`/persona/${id}`),
   setDefault: (id: string) => api.post(`/persona/${id}/default`),
   getTemplates: () => api.get('/persona/templates'),
+  analyzeVoice: (sampleText: string) => api.post('/persona/analyze-voice', { sampleText }),
 };
 
 // Content API

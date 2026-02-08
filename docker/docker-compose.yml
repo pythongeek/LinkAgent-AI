@@ -3,6 +3,7 @@ version: '3.8'
 services:
   # Main API server
   api:
+    container_name: linkedin-api
     build:
       context: ..
       dockerfile: docker/Dockerfile.scraper
@@ -23,28 +24,30 @@ services:
       - ../logs:/app/logs
     restart: unless-stopped
     networks:
-      - linkedin-platform
+      - linkedin-platform-network
 
   # Redis for caching and queues
   redis:
+    container_name: linkedin-redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/data
+      - linkedin-redis-data:/data
     restart: unless-stopped
     networks:
-      - linkedin-platform
+      - linkedin-platform-network
 
   # Worker for background jobs
   worker:
+    container_name: linkedin-worker
     build:
       context: ..
       dockerfile: docker/Dockerfile.worker
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     depends_on:
@@ -52,32 +55,33 @@ services:
       - api
     restart: unless-stopped
     networks:
-      - linkedin-platform
+      - linkedin-platform-network
 
   # Browser automation service
   browser-automation:
+    container_name: linkedin-browser-automation
     build:
       context: ..
       dockerfile: docker/Dockerfile.browser
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=${REDIS_URL}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     ports:
       - "3002:3002"
     volumes:
-      - browser-data:/app/data
+      - linkedin-browser-data:/app/data
     restart: unless-stopped
     networks:
-      - linkedin-platform
+      - linkedin-platform-network
     shm_size: '2gb'
 
 volumes:
-  redis-data:
-  browser-data:
+  linkedin-redis-data:
+  linkedin-browser-data:
 
 networks:
-  linkedin-platform:
+  linkedin-platform-network:
     driver: bridge

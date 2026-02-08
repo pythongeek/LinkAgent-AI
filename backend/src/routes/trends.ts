@@ -225,8 +225,33 @@ router.post('/opportunity-score', authenticate, async (req, res) => {
       });
     }
 
+    // Get existing topic data for competition stats
+    const existingTopic = await prisma.topic.findUnique({
+      where: { keyword: topic.toLowerCase() },
+    });
+
+    let competitionStats;
+    if (existingTopic?.competitionData) {
+      const data = existingTopic.competitionData as any;
+      if (data.avgEngagement) {
+        // Normalize engagement (0-100)
+        // Assume 500 likes is high engagement
+        const engagement = Math.min(100, (data.avgEngagement.likes / 500) * 100);
+
+        // Normalize competition based on posts analyzed (0-100)
+        // Assume 50 posts analyzed means high competition data availability
+        // This is a proxy since we don't have total global posts count
+        const competition = Math.min(100, (data.totalPosts / 50) * 100);
+
+        competitionStats = {
+          competition,
+          engagement
+        };
+      }
+    }
+
     const analyzer = new TrendAnalyzer();
-    const score = await analyzer.calculateOpportunityScore(topic);
+    const score = await analyzer.calculateOpportunityScore(topic, competitionStats);
 
     // Save or update topic
     await prisma.topic.upsert({

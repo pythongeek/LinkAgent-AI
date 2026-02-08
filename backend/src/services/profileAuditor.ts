@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 import { logger } from '../utils/logger';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
@@ -174,10 +175,55 @@ Return JSON:
       };
     }
 
-    return {
-      score: 70,
-      feedback: ['Banner image present. Ensure it reflects your personal brand.'],
-    };
+    try {
+      // Fetch image
+      const response = await axios.get(bannerUrl, { responseType: 'arraybuffer' });
+      const mimeType = response.headers['content-type'];
+      const data = Buffer.from(response.data).toString('base64');
+
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+
+      const prompt = `Analyze this LinkedIn profile banner image.
+
+Evaluate:
+1. Professionalism
+2. Branding clarity
+3. Design quality
+4. Text readability (if any)
+
+Return JSON:
+{
+  "score": 0-100,
+  "feedback": ["...", "..."]
+}`;
+
+      const result = await model.generateContent([
+        prompt,
+        {
+          inlineData: {
+            mimeType,
+            data,
+          },
+        },
+      ]);
+
+      const text = result.response.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+
+      return {
+        score: 70,
+        feedback: ['Banner image analyzed but could not parse details. Ensure it is professional.'],
+      };
+    } catch (error) {
+      logger.error('Banner analysis error:', error);
+      return {
+        score: 70,
+        feedback: ['Banner image present. Ensure it reflects your personal brand. (Analysis failed)'],
+      };
+    }
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from '../server';
+import { prisma } from '../utils/prisma';
 import { authenticate } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { competitorAnalysisSchema } from '../utils/validation';
@@ -120,7 +120,20 @@ router.get('/gaps/:topic', authenticate, async (req, res) => {
     }
 
     const analyzer = new CompetitorAnalyzer();
-    const gaps = await analyzer.identifyGaps(topicRecord.competitors, topic);
+    const gaps = await analyzer.identifyGaps(
+      topicRecord.competitors.map((c) => ({
+        id: c.id,
+        author: c.author,
+        authorProfile: c.authorProfile || undefined,
+        content: c.content,
+        likes: c.likes,
+        comments: c.comments,
+        shares: c.shares,
+        timestamp: c.postedAt?.toISOString(),
+        postUrl: c.postUrl || undefined,
+      })),
+      topic
+    );
 
     res.json({ gaps });
   } catch (error) {

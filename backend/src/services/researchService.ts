@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
 import { logger } from '../utils/logger';
+import { prisma } from '../utils/prisma';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
@@ -13,10 +14,67 @@ export interface ResearchResult {
 
 export class ResearchService {
   /**
+   * Helper to get cached results
+   */
+  private async getCachedResults(query: string, type: string): Promise<ResearchResult[] | null> {
+    try {
+      const cached = await prisma.researchCache.findFirst({
+        where: {
+          query,
+          queryType: type,
+          expiresAt: { gt: new Date() },
+        },
+      });
+
+      if (cached) {
+        logger.info(`Research cache hit for ${type} search: ${query}`);
+        return cached.results as unknown as ResearchResult[];
+      }
+      return null;
+    } catch (error) {
+      logger.warn(`Cache lookup failed for ${query}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Helper to save results to cache
+   */
+  private async cacheResults(query: string, type: string, results: ResearchResult[], source: string): Promise<void> {
+    try {
+      if (results.length === 0) return;
+
+      // Remove old cache entries to avoid duplicates
+      await prisma.researchCache.deleteMany({
+        where: {
+          query,
+          queryType: type,
+        },
+      });
+
+      await prisma.researchCache.create({
+        data: {
+          query,
+          queryType: type,
+          results: results as any,
+          source,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        },
+      });
+    } catch (error) {
+      logger.warn(`Cache save failed for ${query}:`, error);
+    }
+  }
+
+  /**
    * Perform web search using Google Custom Search API
    */
   async webSearch(query: string, limit: number = 10): Promise<ResearchResult[]> {
     try {
+      // Check cache first
+      const cached = await this.getCachedResults(query, 'web');
+      if (cached) return cached;
+
       const apiKey = process.env.GOOGLE_API_KEY;
       const cx = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
@@ -34,12 +92,17 @@ export class ResearchService {
         },
       });
 
-      return (response.data.items || []).map((item: any) => ({
+      const results = (response.data.items || []).map((item: any) => ({
         title: item.title,
         snippet: item.snippet,
         url: item.link,
         source: item.displayLink,
       }));
+
+      // Cache results
+      await this.cacheResults(query, 'web', results, 'google-custom-search');
+
+      return results;
     } catch (error) {
       logger.error('Web search error:', error);
       return this.geminiSearch(query, limit);
@@ -51,6 +114,10 @@ export class ResearchService {
    */
   async geminiSearch(query: string, limit: number = 10): Promise<ResearchResult[]> {
     try {
+      // Check cache first
+      const cached = await this.getCachedResults(query, 'gemini');
+      if (cached) return cached;
+
       const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
 
       const prompt = `Search for information about: "${query}"
@@ -72,13 +139,19 @@ Return in JSON format:
       const response = await result.response;
       const text = response.text();
 
+      let results: ResearchResult[] = [];
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
-        return parsed.results || [];
+        results = parsed.results || [];
       }
 
-      return [];
+      // Cache results
+      if (results.length > 0) {
+        await this.cacheResults(query, 'gemini', results, 'gemini');
+      }
+
+      return results;
     } catch (error) {
       logger.error('Gemini search error:', error);
       return [];
@@ -90,6 +163,10 @@ Return in JSON format:
    */
   async newsSearch(query: string, limit: number = 10): Promise<ResearchResult[]> {
     try {
+      // Check cache first
+      const cached = await this.getCachedResults(query, 'news');
+      if (cached) return cached;
+
       const apiKey = process.env.GOOGLE_API_KEY;
       const cx = process.env.GOOGLE_SEARCH_ENGINE_ID;
 
@@ -107,12 +184,17 @@ Return in JSON format:
         },
       });
 
-      return (response.data.items || []).map((item: any) => ({
+      const results = (response.data.items || []).map((item: any) => ({
         title: item.title,
         snippet: item.snippet,
         url: item.link,
         source: item.displayLink,
       }));
+
+      // Cache results
+      await this.cacheResults(query, 'news', results, 'google-custom-search');
+
+      return results;
     } catch (error) {
       logger.error('News search error:', error);
       return [];

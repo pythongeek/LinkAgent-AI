@@ -115,7 +115,7 @@ export class ContentGenerationService {
    */
   async generateSuggestions(topic: string, gaps: any): Promise<ContentSuggestion[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       const prompt = `Generate 5 content ideas for LinkedIn about "${topic}" based on these content gaps:
 
@@ -165,7 +165,7 @@ Return in JSON format:
    */
   async regenerateSection(content: string, section: string, instructions: string): Promise<string> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
       const prompt = `Regenerate this section of a LinkedIn post:
 

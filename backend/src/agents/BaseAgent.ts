@@ -3,7 +3,7 @@ import { logger } from '../utils/logger';
 
 export abstract class BaseAgent {
   protected genAI: GoogleGenerativeAI;
-  protected modelName: string = 'gemini-2.0-flash-exp';
+  protected modelName: string = 'gemini-1.5-flash';
 
   constructor() {
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');

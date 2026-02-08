@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
-import { prisma } from '../server';
+import { prisma } from '../utils/prisma';
 import { authenticate, generateToken } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { userRegistrationSchema, userLoginSchema, linkedinCookiesSchema } from '../utils/validation';

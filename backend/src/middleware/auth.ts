@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../server';
+import { prisma } from '../utils/prisma';
 import { logger } from '../utils/logger';
 
 // Extend Express Request type to include user
@@ -74,7 +74,11 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Attach user to request
-    req.user = user;
+    req.user = {
+      id: user.id,
+      email: user.email,
+      name: user.name || undefined,
+    };
     next();
   } catch (error) {
     logger.error('Auth middleware error:', error);
@@ -118,7 +122,11 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
     });
 
     if (user) {
-      req.user = user;
+      req.user = {
+        id: user.id,
+        email: user.email,
+        name: user.name || undefined,
+      };
     }
 
     next();

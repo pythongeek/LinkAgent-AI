@@ -292,7 +292,10 @@ export class TrendAnalyzer {
   /**
    * Calculate opportunity score for a topic
    */
-  async calculateOpportunityScore(topic: string): Promise<OpportunityScore> {
+  async calculateOpportunityScore(
+    topic: string,
+    competitionStats?: { competition: number; engagement: number }
+  ): Promise<OpportunityScore> {
     try {
       // Get trend data
       const trendData = await this.getTrendData(topic);
@@ -301,10 +304,9 @@ export class TrendAnalyzer {
       const trendMomentum = trendData.trendScore;
       const searchVolume = this.calculateSearchVolume(trendData.interestOverTime);
       
-      // For competition and engagement, we'd need LinkedIn data
-      // For now, use estimated values
-      const competition = Math.floor(Math.random() * 50) + 20; // Simulated
-      const engagement = Math.floor(Math.random() * 40) + 40; // Simulated
+      // Use provided stats or default to neutral
+      const competition = competitionStats?.competition ?? 50;
+      const engagement = competitionStats?.engagement ?? 50;
 
       // Weighted scoring
       const weights = {

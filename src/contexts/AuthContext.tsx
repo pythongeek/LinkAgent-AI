@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-
+import { api } from '../services/api';
 import { toast } from 'sonner';
 
 interface User {
@@ -23,37 +23,66 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Mock user for bypass
-  const mockUser: User = {
-    id: 'mock-user-id',
-    email: 'demo@example.com',
-    name: 'Demo User',
-    avatar: null,
-    linkedinConnected: false,
-  };
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [user] = useState<User | null>(mockUser);
-  const [isLoading] = useState(false);
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      const response = await api.get('/auth/me');
+      setUser(response.data.user);
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      localStorage.removeItem('token');
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem('token', 'demo-token');
+    fetchUser();
   }, []);
 
-  // No-op functions for auth actions
-  const login = async (_email: string, _password: string) => {
-    toast.success('Welcome back! (Demo Mode)');
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+      setUser(user);
+      toast.success('Welcome back!');
+    } catch (error: any) {
+      const message = error.response?.data?.error?.message || 'Failed to login';
+      toast.error(message);
+      throw error;
+    }
   };
 
-  const register = async (_email: string, _password: string, _name: string) => {
-    toast.success('Account created! (Demo Mode)');
+  const register = async (email: string, password: string, name: string) => {
+    try {
+      const response = await api.post('/auth/register', { email, password, name });
+      const { token, user } = response.data;
+
+      localStorage.setItem('token', token);
+      setUser(user);
+      toast.success('Account created successfully!');
+    } catch (error: any) {
+      const message = error.response?.data?.error?.message || 'Failed to register';
+      toast.error(message);
+      throw error;
+    }
   };
 
   const logout = () => {
-    toast.info('Logout disabled in Demo Mode');
-  };
-
-  const fetchUser = async () => {
-    // No-op
+    localStorage.removeItem('token');
+    setUser(null);
+    toast.success('Logged out successfully');
   };
 
   return (
@@ -61,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isLoading,
-        isAuthenticated: true, // Always authenticated
+        isAuthenticated: !!user,
         login,
         register,
         logout,

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb } from 'lucide-react';
+import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb, Copy, Check } from 'lucide-react';
 
 const contentTypes = [
   { value: 'post', label: 'LinkedIn Post', icon: Sparkles },
@@ -27,6 +27,7 @@ export default function ContentStudio() {
   const [includeImages] = useState(true);
   const [generatedContent, setGeneratedContent] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const { data: personas } = useQuery({
     queryKey: ['personas'],
@@ -59,6 +60,19 @@ export default function ContentStudio() {
       includeImages,
     });
     setIsGenerating(false);
+  };
+
+  const handleCopy = async () => {
+    if (!generatedContent?.content) return;
+
+    try {
+      await navigator.clipboard.writeText(generatedContent.content);
+      setIsCopied(true);
+      toast.success('Content copied to clipboard');
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy content');
+    }
   };
 
   return (
@@ -191,8 +205,23 @@ export default function ContentStudio() {
                     className="font-mono text-sm"
                   />
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1">
-                      Copy to Clipboard
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleCopy}
+                      disabled={!generatedContent?.content}
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy to Clipboard
+                        </>
+                      )}
                     </Button>
                     <Button className="flex-1">Save to Library</Button>
                   </div>

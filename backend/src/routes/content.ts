@@ -17,6 +17,14 @@ router.post('/generate', authenticate, validateBody(contentGenerationSchema), as
     const { topic, contentType, personaId, outline, researchDepth, includeImages } = req.body;
     const userId = req.user!.id;
 
+    logger.info(`Received content generation request from user ${userId}`, {
+      topic,
+      contentType,
+      personaId,
+      researchDepth,
+      includeImages
+    });
+
     // Get persona if specified
     let persona = null;
     if (personaId) {
@@ -30,6 +38,12 @@ router.post('/generate', authenticate, validateBody(contentGenerationSchema), as
       persona = await prisma.persona.findFirst({
         where: { userId, isDefault: true },
       });
+    }
+
+    if (persona) {
+      logger.info(`Using persona: ${persona.name} (${persona.id})`);
+    } else {
+      logger.info('No persona found, proceeding without persona customization');
     }
 
     // Generate content using multi-agent system
@@ -65,7 +79,7 @@ router.post('/generate', authenticate, validateBody(contentGenerationSchema), as
       data: { contentsGenerated: { increment: 1 } },
     });
 
-    logger.info(`Content generated: ${savedContent.id} for user: ${userId}`);
+    logger.info(`Content generated successfully: ${savedContent.id} for user: ${userId}`);
 
     res.status(201).json({
       message: 'Content generated successfully',
@@ -75,11 +89,19 @@ router.post('/generate', authenticate, validateBody(contentGenerationSchema), as
       },
     });
   } catch (error) {
-    logger.error('Content generation error:', error);
+    logger.error('Content generation request failed:', error);
+    if (error instanceof Error) {
+      logger.error(error.stack);
+    }
+
+    // Send more detailed error to client in development
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate content';
+
     res.status(500).json({
       error: {
-        message: 'Failed to generate content',
+        message: errorMessage,
         code: 'CONTENT_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error : undefined
       },
     });
   }
@@ -122,6 +144,7 @@ router.get('/', authenticate, async (req, res) => {
     });
   } catch (error) {
     logger.error('Get content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to fetch content',
@@ -158,6 +181,7 @@ router.get('/:id', authenticate, async (req, res) => {
     res.json({ content });
   } catch (error) {
     logger.error('Get single content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to fetch content',
@@ -209,6 +233,7 @@ router.put('/:id', authenticate, async (req, res) => {
     });
   } catch (error) {
     logger.error('Update content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to update content',
@@ -251,6 +276,7 @@ router.delete('/:id', authenticate, async (req, res) => {
     });
   } catch (error) {
     logger.error('Delete content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to delete content',
@@ -274,6 +300,7 @@ router.post('/suggestions', authenticate, async (req, res) => {
     res.json({ suggestions });
   } catch (error) {
     logger.error('Content suggestions error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to generate suggestions',
@@ -317,6 +344,7 @@ router.post('/:id/regenerate', authenticate, async (req, res) => {
     });
   } catch (error) {
     logger.error('Regenerate content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to regenerate content',
@@ -370,6 +398,7 @@ router.get('/:id/export', authenticate, async (req, res) => {
     });
   } catch (error) {
     logger.error('Export content error:', error);
+    if (error instanceof Error) logger.error(error.stack);
     res.status(500).json({
       error: {
         message: 'Failed to export content',

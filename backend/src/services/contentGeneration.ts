@@ -4,8 +4,6 @@ import { PersonaService } from './personaService';
 import { ResearchService } from './researchService';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 export interface ContentGenerationOptions {
   topic: string;
   contentType: 'post' | 'carousel' | 'article' | 'poll';
@@ -45,9 +43,29 @@ export interface ContentSuggestion {
  */
 export class ContentGenerationService {
   private researchService: ResearchService;
+  private genAI: GoogleGenerativeAI;
+  private modelName: string;
 
   constructor() {
     this.researchService = new ResearchService();
+    const apiKey = process.env.GEMINI_API_KEY || '';
+    this.genAI = new GoogleGenerativeAI(apiKey);
+
+    // Explicitly check if the env var is set to the problematic model
+    // and override it if so.
+    const envModel = process.env.GEMINI_MODEL;
+    if (envModel === 'gemini-2.0-flash-exp') {
+      logger.warn(`GEMINI_MODEL env var is set to deprecated model '${envModel}'. Falling back to 'gemini-1.5-flash'.`);
+      this.modelName = 'gemini-1.5-flash';
+    } else {
+      this.modelName = envModel || 'gemini-1.5-flash';
+    }
+
+    if (!apiKey) {
+      logger.error('GEMINI_API_KEY is missing in environment variables');
+    } else {
+      logger.info(`ContentGenerationService initialized with model: ${this.modelName} (env var was: ${envModel})`);
+    }
   }
 
   /**
@@ -57,10 +75,18 @@ export class ContentGenerationService {
   async generateContent(options: ContentGenerationOptions): Promise<GeneratedContent> {
     const { topic, contentType, persona, outline, researchDepth, includeImages } = options;
 
+    logger.info(`Starting content generation pipeline for topic: "${topic}"`, {
+      contentType,
+      researchDepth,
+      personaId: persona?.id,
+      model: this.modelName
+    });
+
     try {
       // Step 1: Research Agent
       logger.info(`[Research Agent] Starting research for: ${topic}`);
       const researchData = await this.researchAgent(topic, researchDepth);
+      logger.info(`[Research Agent] Completed. Found ${researchData.sources?.length || 0} sources.`);
 
       // Step 2: Writing Agent
       logger.info(`[Writing Agent] Creating content`);
@@ -71,14 +97,17 @@ export class ContentGenerationService {
         outline,
         researchData,
       });
+      logger.info(`[Writing Agent] Draft created. Length: ${draft.content?.length || 0} chars.`);
 
       // Step 3: Editing Agent
       logger.info(`[Editing Agent] Optimizing content`);
       const edited = await this.editingAgent(draft, contentType);
+      logger.info(`[Editing Agent] Content optimized.`);
 
       // Step 4: Fact Checker Agent
       logger.info(`[Fact Checker] Verifying claims`);
       const verified = await this.factCheckAgent(edited, researchData.sources);
+      logger.info(`[Fact Checker] Verification complete. Verified: ${verified.verified !== false}`);
 
       // Generate images if requested
       let images: string[] = [];
@@ -86,10 +115,13 @@ export class ContentGenerationService {
       if (includeImages && verified.imagePrompts) {
         imagePrompts = verified.imagePrompts;
         // Images will be generated separately via the images API
+        logger.info(`[Image Generator] ${imagePrompts.length} prompts generated.`);
       }
 
       // Predict engagement
+      logger.info(`[Engagement Predictor] Predicting score...`);
       const engagementPrediction = await this.predictEngagement(verified.content, contentType);
+      logger.info(`[Engagement Predictor] Score: ${engagementPrediction}`);
 
       return {
         title: verified.title,
@@ -102,7 +134,10 @@ export class ContentGenerationService {
         engagementPrediction,
       };
     } catch (error) {
-      logger.error('Content generation error:', error);
+      logger.error('Content generation pipeline failed:', error);
+      if (error instanceof Error) {
+        logger.error(error.stack);
+      }
       throw error;
     }
   }
@@ -113,7 +148,7 @@ export class ContentGenerationService {
    */
   private async researchAgent(topic: string, depth: 'quick' | 'deep'): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Research the topic: "${topic}"
 
@@ -145,15 +180,19 @@ Return your findings in this JSON format:
   "keyInsights": ["insight1", "insight2"]
 }`;
 
+      logger.debug(`[Research Agent] Sending prompt to Gemini...`);
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
+      logger.debug(`[Research Agent] Received response length: ${text.length}`);
 
       // Extract JSON
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
+
+      logger.warn(`[Research Agent] Failed to parse JSON from response. Response: ${text.substring(0, 200)}...`);
 
       return {
         statistics: [],
@@ -165,6 +204,7 @@ Return your findings in this JSON format:
       };
     } catch (error) {
       logger.error('Research agent error:', error);
+      if (error instanceof Error) logger.error(error.stack);
       return {
         statistics: [],
         expertOpinions: [],
@@ -190,7 +230,7 @@ Return your findings in this JSON format:
     const { topic, contentType, persona, outline, researchData } = params;
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       let prompt = '';
 
@@ -232,15 +272,19 @@ Return in JSON format:
   "imagePrompts": ["prompt1", "prompt2"]
 }`;
 
+      logger.debug(`[Writing Agent] Sending prompt to Gemini...`);
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
+      logger.debug(`[Writing Agent] Received response length: ${text.length}`);
 
       // Extract JSON
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
+
+      logger.warn(`[Writing Agent] Failed to parse JSON from response. Response: ${text.substring(0, 200)}...`);
 
       return {
         title: topic,
@@ -250,6 +294,7 @@ Return in JSON format:
       };
     } catch (error) {
       logger.error('Writing agent error:', error);
+      if (error instanceof Error) logger.error(error.stack);
       return {
         title: topic,
         content: 'Error generating content.',
@@ -265,7 +310,7 @@ Return in JSON format:
    */
   private async editingAgent(draft: any, contentType: string): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Edit and optimize this LinkedIn ${contentType} for maximum engagement:
 
@@ -284,9 +329,11 @@ Editing Tasks:
 
 Return the edited content in the same JSON format with improvements noted.`;
 
+      logger.debug(`[Editing Agent] Sending prompt to Gemini...`);
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
+      logger.debug(`[Editing Agent] Received response length: ${text.length}`);
 
       // Extract JSON or return original with edits
       const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -294,9 +341,11 @@ Return the edited content in the same JSON format with improvements noted.`;
         return { ...draft, ...JSON.parse(jsonMatch[0]) };
       }
 
+      logger.warn(`[Editing Agent] Failed to parse JSON. Using raw text.`);
       return { ...draft, content: text };
     } catch (error) {
       logger.error('Editing agent error:', error);
+      if (error instanceof Error) logger.error(error.stack);
       return draft;
     }
   }
@@ -307,7 +356,7 @@ Return the edited content in the same JSON format with improvements noted.`;
    */
   private async factCheckAgent(content: any, sources: any[]): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Fact-check this LinkedIn content:
 
@@ -334,9 +383,11 @@ Return in JSON format:
   "content": "updated content if changes needed"
 }`;
 
+      logger.debug(`[Fact Checker] Sending prompt to Gemini...`);
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
+      logger.debug(`[Fact Checker] Received response length: ${text.length}`);
 
       // Extract JSON
       const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -349,9 +400,11 @@ Return in JSON format:
         };
       }
 
+      logger.warn(`[Fact Checker] Failed to parse JSON.`);
       return { ...content, sources };
     } catch (error) {
       logger.error('Fact check agent error:', error);
+      if (error instanceof Error) logger.error(error.stack);
       return { ...content, sources };
     }
   }
@@ -361,7 +414,7 @@ Return in JSON format:
    */
   private async predictEngagement(content: string, contentType: string): Promise<number> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn ${contentType} and predict its engagement potential:
 
@@ -392,7 +445,7 @@ Return only a number between 0-100.`;
    */
   async generateSuggestions(topic: string, gaps: any): Promise<ContentSuggestion[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Generate 5 content ideas for LinkedIn about "${topic}" based on these content gaps:
 
@@ -442,7 +495,7 @@ Return in JSON format:
    */
   async regenerateSection(content: string, section: string, instructions: string): Promise<string> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Regenerate this section of a LinkedIn post:
 

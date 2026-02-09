@@ -2,8 +2,6 @@ import { Persona } from '@prisma/client';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 export interface PersonaData {
   name: string;
   jobRole: string;
@@ -26,6 +24,14 @@ export interface PersonaTemplate {
 }
 
 export class PersonaService {
+  private static getGenAI() {
+    return new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+  }
+
+  private static getModelName() {
+    return process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  }
+
   /**
    * Generate system prompt from persona data
    * This is the core of the Dynamic Persona Engine
@@ -82,7 +88,7 @@ Your goal is to create authentic, valuable content that reflects your unique exp
    */
   static async generatePreview(persona: Persona, sampleTopic: string): Promise<string> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.getGenAI().getGenerativeModel({ model: this.getModelName() });
 
       const prompt = `${persona.systemPrompt}
 
@@ -208,7 +214,7 @@ Make it engaging, authentic, and true to your voice. Include a hook and a call-t
     outline?: any
   ): Promise<{ content: string; imagePrompts: string[] }> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.getGenAI().getGenerativeModel({ model: this.getModelName() });
 
       const contextWrapper = this.buildContextWrapper(persona, {
         contentType,

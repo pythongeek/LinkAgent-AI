@@ -4,8 +4,6 @@ import { LinkedInScraper } from './linkedinScraper';
 import { ProfileAuditor } from './profileAuditor';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 /**
  * Profile Watchdog Service
  * 
@@ -17,9 +15,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
  */
 export class ProfileWatchdogService {
   private prisma: PrismaClient;
+  private genAI: GoogleGenerativeAI;
+  private modelName: string;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
   }
 
   /**
@@ -82,7 +84,7 @@ export class ProfileWatchdogService {
    */
   private async checkOutdatedContent(user: any, audit: any): Promise<void> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn profile content for outdated information:
 
@@ -133,7 +135,7 @@ Return JSON array of outdated items with suggestions.`;
       const trends = await auditor.getIndustryTrends('general');
 
       // Compare with user's current profile
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Compare this LinkedIn profile with current industry trends:
 
@@ -177,7 +179,7 @@ Return JSON with recommendations.`;
       const topCreators = await new ProfileAuditor().getTopCreators('general');
 
       // Analyze gaps
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Compare this LinkedIn profile with top performers:
 

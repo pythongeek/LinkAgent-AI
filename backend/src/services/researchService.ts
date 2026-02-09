@@ -2,8 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 export interface ResearchResult {
   title: string;
   snippet: string;
@@ -12,6 +10,14 @@ export interface ResearchResult {
 }
 
 export class ResearchService {
+  private genAI: GoogleGenerativeAI;
+  private modelName: string;
+
+  constructor() {
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  }
+
   /**
    * Perform web search using Google Custom Search API
    */
@@ -51,7 +57,7 @@ export class ResearchService {
    */
   async geminiSearch(query: string, limit: number = 10): Promise<ResearchResult[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Search for information about: "${query}"
 
@@ -124,7 +130,7 @@ Return in JSON format:
    */
   async extractFromUrl(url: string): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Extract key information from this URL: ${url}
 
@@ -158,7 +164,7 @@ Return in JSON format.`;
    */
   async summarizeFindings(results: ResearchResult[]): Promise<string> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Summarize these research findings into key insights:
 

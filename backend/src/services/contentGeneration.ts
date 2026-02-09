@@ -44,16 +44,18 @@ export interface ContentSuggestion {
 export class ContentGenerationService {
   private researchService: ResearchService;
   private genAI: GoogleGenerativeAI;
+  private modelName: string;
 
   constructor() {
     this.researchService = new ResearchService();
     const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
     if (!apiKey) {
       logger.error('GEMINI_API_KEY is missing in environment variables');
     } else {
-      logger.info('ContentGenerationService initialized with GEMINI_API_KEY present');
+      logger.info(`ContentGenerationService initialized with model: ${this.modelName}`);
     }
   }
 
@@ -67,7 +69,8 @@ export class ContentGenerationService {
     logger.info(`Starting content generation pipeline for topic: "${topic}"`, {
       contentType,
       researchDepth,
-      personaId: persona?.id
+      personaId: persona?.id,
+      model: this.modelName
     });
 
     try {
@@ -136,7 +139,7 @@ export class ContentGenerationService {
    */
   private async researchAgent(topic: string, depth: 'quick' | 'deep'): Promise<any> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Research the topic: "${topic}"
 
@@ -218,7 +221,7 @@ Return your findings in this JSON format:
     const { topic, contentType, persona, outline, researchData } = params;
 
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       let prompt = '';
 
@@ -298,7 +301,7 @@ Return in JSON format:
    */
   private async editingAgent(draft: any, contentType: string): Promise<any> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Edit and optimize this LinkedIn ${contentType} for maximum engagement:
 
@@ -344,7 +347,7 @@ Return the edited content in the same JSON format with improvements noted.`;
    */
   private async factCheckAgent(content: any, sources: any[]): Promise<any> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Fact-check this LinkedIn content:
 
@@ -402,7 +405,7 @@ Return in JSON format:
    */
   private async predictEngagement(content: string, contentType: string): Promise<number> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn ${contentType} and predict its engagement potential:
 
@@ -433,7 +436,7 @@ Return only a number between 0-100.`;
    */
   async generateSuggestions(topic: string, gaps: any): Promise<ContentSuggestion[]> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Generate 5 content ideas for LinkedIn about "${topic}" based on these content gaps:
 
@@ -483,7 +486,7 @@ Return in JSON format:
    */
   async regenerateSection(content: string, section: string, instructions: string): Promise<string> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Regenerate this section of a LinkedIn post:
 

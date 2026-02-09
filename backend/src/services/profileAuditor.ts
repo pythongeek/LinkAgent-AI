@@ -2,8 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 export interface ProfileAuditResult {
   overallScore: number;
   seoScore: number;
@@ -34,6 +32,14 @@ export interface ProfileAuditResult {
 }
 
 export class ProfileAuditor {
+  private genAI: GoogleGenerativeAI;
+  private modelName: string;
+
+  constructor() {
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  }
+
   /**
    * Run comprehensive profile audit
    */
@@ -88,7 +94,7 @@ export class ProfileAuditor {
    */
   private async analyzeHeadline(headline: string, industry: string): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn headline for a ${industry} professional:
 
@@ -128,7 +134,7 @@ Return JSON:
    */
   private async analyzeAbout(about: string, industry: string): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn About section for a ${industry} professional:
 
@@ -181,7 +187,7 @@ Return JSON:
       const mimeType = response.headers['content-type'];
       const data = Buffer.from(response.data).toString('base64');
 
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Analyze this LinkedIn profile banner image.
 
@@ -263,7 +269,7 @@ Return JSON:
    */
   private async identifyGaps(profile: any, industry: string, focusAreas?: string[]): Promise<string[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Identify gaps in this LinkedIn profile for a ${industry} professional:
 
@@ -332,7 +338,7 @@ Return a JSON array of gap descriptions.`;
    */
   async getTopCreators(industry: string): Promise<any[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `List 5 top LinkedIn creators in the ${industry} industry.
 
@@ -365,7 +371,7 @@ Return JSON array.`;
    */
   async getIndustryTrends(industry: string): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `What are the current LinkedIn content trends for ${industry} professionals in 2025?
 
@@ -399,7 +405,7 @@ Return JSON format.`;
    */
   async generateHeadlines(currentHeadline: string, industry: string, focus?: string): Promise<any[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Generate 5 LinkedIn headline variations for a ${industry} professional.
 
@@ -434,7 +440,7 @@ Return JSON array with type and headline.`;
    */
   async generateAbout(persona: string, achievements: string[], targetAudience: string): Promise<string> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Write a compelling LinkedIn About section:
 

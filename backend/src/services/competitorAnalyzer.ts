@@ -2,8 +2,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { LinkedInPost } from './linkedinScraper';
 import { logger } from '../utils/logger';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
 export interface CompetitorAnalysis {
   totalPosts: number;
   avgEngagement: {
@@ -23,6 +21,14 @@ export interface CompetitorAnalysis {
 }
 
 export class CompetitorAnalyzer {
+  private genAI: GoogleGenerativeAI;
+  private modelName: string;
+
+  constructor() {
+    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+  }
+
   /**
    * Analyze competitor posts
    */
@@ -78,7 +84,7 @@ export class CompetitorAnalyzer {
    */
   private async analyzeContentPatterns(posts: LinkedInPost[]): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const postsSample = posts.slice(0, 20).map((p) => p.content).join('\n\n---\n\n');
 
@@ -126,7 +132,7 @@ Return in JSON format.`;
    */
   async identifyGaps(posts: LinkedInPost[], topic?: string): Promise<string[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const postsSample = posts.slice(0, 30).map((p) => p.content).join('\n\n---\n\n');
 
@@ -169,7 +175,7 @@ Return a JSON array of gap descriptions.`;
     gaps: string[]
   ): Promise<string[]> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const prompt = `Based on these content gaps for "${topic}":
 
@@ -200,7 +206,7 @@ Return a JSON array of opportunity descriptions with specific angles.`;
    */
   async analyzeEngagementPatterns(posts: LinkedInPost[]): Promise<any> {
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
 
       const postsWithEngagement = posts
         .slice(0, 20)

@@ -50,12 +50,21 @@ export class ContentGenerationService {
     this.researchService = new ResearchService();
     const apiKey = process.env.GEMINI_API_KEY || '';
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.modelName = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+
+    // Explicitly check if the env var is set to the problematic model
+    // and override it if so.
+    const envModel = process.env.GEMINI_MODEL;
+    if (envModel === 'gemini-2.0-flash-exp') {
+      logger.warn(`GEMINI_MODEL env var is set to deprecated model '${envModel}'. Falling back to 'gemini-1.5-flash'.`);
+      this.modelName = 'gemini-1.5-flash';
+    } else {
+      this.modelName = envModel || 'gemini-1.5-flash';
+    }
 
     if (!apiKey) {
       logger.error('GEMINI_API_KEY is missing in environment variables');
     } else {
-      logger.info(`ContentGenerationService initialized with model: ${this.modelName}`);
+      logger.info(`ContentGenerationService initialized with model: ${this.modelName} (env var was: ${envModel})`);
     }
   }
 

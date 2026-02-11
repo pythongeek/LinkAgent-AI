@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "linkedin-content-platform",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    }
+  ],
+  "buildCommand": "vite build",
+  "installCommand": "npm install",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

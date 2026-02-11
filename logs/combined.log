@@ -1,0 +1,15 @@
+{"environment":"development","level":"info","message":"[Phase 1] Research & Trend Analysis for: Test Topic","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:29.593Z"}
+{"environment":"development","level":"info","message":"[Phase 2] SEO Optimization","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:29.796Z"}
+{"environment":"development","level":"info","message":"[Phase 3] Hook Generation","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:29.997Z"}
+{"environment":"development","level":"info","message":"[Phase 4] Content Writing","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:30.198Z"}
+{"environment":"development","level":"info","message":"[Phase 5] Editing & Optimization","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:30.400Z"}
+{"environment":"development","level":"info","message":"[Phase 6] Fact Checking","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:30.601Z"}
+{"environment":"development","level":"info","message":"[Phase 7] Visual Content Generation","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:30.803Z"}
+{"environment":"development","level":"info","message":"[Phase 8] Timing Optimization","service":"linkedin-content-api","timestamp":"2026-02-11T17:05:31.003Z"}
+{"environment":"development","level":"info","message":"[Phase 1] Research, Trend Analysis & Timing for: Test Topic","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:15.558Z"}
+{"environment":"development","level":"info","message":"[Phase 2] SEO Optimization","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:15.760Z"}
+{"environment":"development","level":"info","message":"[Phase 3] Hook Generation","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:15.962Z"}
+{"environment":"development","level":"info","message":"[Phase 4] Content Writing","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:16.163Z"}
+{"environment":"development","level":"info","message":"[Phase 5] Editing & Optimization","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:16.364Z"}
+{"environment":"development","level":"info","message":"[Phase 6] Fact Checking","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:16.566Z"}
+{"environment":"development","level":"info","message":"[Phase 7 & 9] Visual Content & Engagement Prediction","service":"linkedin-content-api","timestamp":"2026-02-11T17:06:16.766Z"}

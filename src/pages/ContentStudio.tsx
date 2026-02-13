@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb, TrendingUp, Search, Target, Clock, BarChart3, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb, TrendingUp, Search, Target, Clock, BarChart3, RefreshCw, Copy, Check } from 'lucide-react';
 
 const contentTypes = [
   { value: 'post', label: 'LinkedIn Post', icon: Sparkles },
@@ -32,6 +32,7 @@ export default function ContentStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedHook, setSelectedHook] = useState<string>('');
   const [activeTab, setActiveTab] = useState('content');
+  const [isCopied, setIsCopied] = useState(false);
 
   const { data: personas } = useQuery({
     queryKey: ['personas'],
@@ -74,6 +75,21 @@ export default function ContentStudio() {
     if (!topic) return;
     // This would call a specific hook regeneration endpoint
     toast.info('Regenerating hooks...');
+  };
+
+  const handleCopy = () => {
+    if (!generatedContent?.content) return;
+
+    navigator.clipboard.writeText(generatedContent.content)
+      .then(() => {
+        setIsCopied(true);
+        toast.success('Content copied to clipboard');
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((err) => {
+        toast.error('Failed to copy content');
+        console.error('Failed to copy:', err);
+      });
   };
 
   const getEngagementColor = (score: number) => {
@@ -283,8 +299,17 @@ export default function ContentStudio() {
                   />
 
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" onClick={() => navigator.clipboard.writeText(generatedContent.content)}>
-                      Copy to Clipboard
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={handleCopy}
+                    >
+                      {isCopied ? (
+                        <Check className="mr-2 h-4 w-4" />
+                      ) : (
+                        <Copy className="mr-2 h-4 w-4" />
+                      )}
+                      {isCopied ? 'Copied!' : 'Copy to Clipboard'}
                     </Button>
                     <Button className="flex-1">Save to Library</Button>
                   </div>

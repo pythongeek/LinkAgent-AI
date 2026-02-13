@@ -1,0 +1,273 @@
+
+> my-app@0.0.0 lint /app
+> eslint .
+
+
+/app/backend/src/middleware/auth.ts
+    8:3   error  ES2015 module syntax is preferred over namespaces  @typescript-eslint/no-namespace
+  125:12  error  'error' is defined but never used                  @typescript-eslint/no-unused-vars
+
+/app/backend/src/routes/competitor.ts
+   8:10  error  'Encryption' is defined but never used    @typescript-eslint/no-unused-vars
+  54:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/routes/research.ts
+  36:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/routes/trends.ts
+   45:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  235:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/server.ts
+   31:7   error  'PORT' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  130:15  error  Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  130:65  error  'next' is defined but never used           @typescript-eslint/no-unused-vars
+
+/app/backend/src/services/competitorAnalyzer.ts
+   29:55  error  'depth' is defined but never used         @typescript-eslint/no-unused-vars
+   79:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/contentGeneration.ts
+    3:10   error  'PersonaService' is defined but never used      @typescript-eslint/no-unused-vars
+   15:13   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   25:12   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   26:17   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   27:12   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   34:25   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   35:24   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   41:12   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+   83:28   error  'trendData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  163:80   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  229:52   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  276:65   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  320:79   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  320:93   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  373:56   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  426:15   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  427:19   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  428:14   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  431:15   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  454:41   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  504:37   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  504:72   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  504:86   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  558:41   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  558:55   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  558:71   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  700:116  error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  789:50   error  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/linkedinScraper.ts
+  117:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  243:22  error  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  316:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  382:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  419:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/personaService.ts
+  189:77  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  208:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/profileAuditor.ts
+   32:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   33:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   40:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:78  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  257:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  298:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  299:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  300:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  301:5   error  'industry' is defined but never used      @typescript-eslint/no-unused-vars
+  302:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  333:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  366:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  400:95  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/profileWatchdog.ts
+    3:10  error  'LinkedInScraper' is defined but never used  @typescript-eslint/no-unused-vars
+   58:33  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   83:44  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+   83:56  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  130:43  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  130:55  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  174:46  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  174:58  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  197:13  error  'text' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  216:62  error  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/researchService.ts
+   37:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  125:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/backend/src/services/trendAnalyzer.ts
+   29:14  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   30:20  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   72:79  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   88:23  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+   94:23  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  111:21  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  185:27  error  'category' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  185:87  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  195:21  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  198:55  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  200:43  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  217:50  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  229:51  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  234:66  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  253:72  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  261:53  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  274:51  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+
+/app/backend/src/utils/logger.ts
+  3:35  error  'errors' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/app/src/components/ui/badge.tsx
+  46:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/components/ui/button-group.tsx
+  82:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/components/ui/button.tsx
+  62:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/components/ui/form.tsx
+  159:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/components/ui/navigation-menu.tsx
+  167:3  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/components/ui/sidebar.tsx
+  611:26  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/app/src/components/ui/sidebar.tsx:611:26
+  609 |   // Random width between 50 to 90%.
+  610 |   const width = React.useMemo(() => {
+> 611 |     return `${Math.floor(Math.random() * 40) + 50}%`
+      |                          ^^^^^^^^^^^^^ Cannot call impure function
+  612 |   }, [])
+  613 |
+  614 |   return (  react-hooks/purity
+  725:3   error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-refresh/only-export-components
+
+/app/src/components/ui/toggle.tsx
+  45:18  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/contexts/AuthContext.tsx
+   60:21  error  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+   75:21  error  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  105:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/app/src/contexts/ThemeContext.tsx
+  35:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/app/src/contexts/ThemeContext.tsx:35:5
+  33 |
+  34 |     root.classList.add(resolved);
+> 35 |     setResolvedTheme(resolved);
+     |     ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  36 |     localStorage.setItem('theme', theme);
+  37 |   }, [theme]);
+  38 |  react-hooks/set-state-in-effect
+  46:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-refresh/only-export-components
+
+/app/src/pages/CompetitorAnalysis.tsx
+  20:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/ContentHistory.tsx
+  31:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/ContentStudio.tsx
+   31:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   49:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  347:76  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  359:75  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:86  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  452:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  473:82  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/Dashboard.tsx
+  200:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/ImageGenerator.tsx
+  33:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/Login.tsx
+  26:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/app/src/pages/PersonaCreate.tsx
+  56:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/Personas.tsx
+  42:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/ProfileAudit.tsx
+   22:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   26:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/Register.tsx
+  29:14  error  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/app/src/pages/Settings.tsx
+  24:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/pages/TrendExplorer.tsx
+  156:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/services/api.ts
+  33:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  47:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  70:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  90:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/app/src/types/index.ts
+   40:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   41:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   42:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   91:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   95:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 165 problems (165 errors, 0 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.

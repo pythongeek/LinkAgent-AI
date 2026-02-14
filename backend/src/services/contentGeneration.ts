@@ -77,13 +77,14 @@ export class ContentGenerationService {
     const { topic, contentType, persona, outline, researchDepth, includeImages, targetAudience, keywords } = options;
 
     try {
-      // Phase 1: Research & Trend Analysis (Parallel)
-      logger.info(`[Phase 1] Research & Trend Analysis for: ${topic}`);
+      // Phase 1: Research, Trend Analysis & Timing (Parallel)
+      logger.info(`[Phase 1] Research, Trend Analysis & Timing for: ${topic}`);
       
-      const [researchData, trendData, competitiveAnalysis] = await Promise.all([
+      const [researchData, trendData, competitiveAnalysis, bestPostingTime] = await Promise.all([
         this.researchAgent(topic, researchDepth),
         this.trendAgent(topic),
         this.competitorAnalysisAgent(topic),
+        this.timingAgent(targetAudience),
       ]);
 
       // Phase 2: SEO & Keywords
@@ -115,19 +116,15 @@ export class ContentGenerationService {
       logger.info(`[Phase 6] Fact Checking`);
       const verified = await this.factCheckAgent(edited, researchData.sources);
 
-      // Phase 7: Visual Content
-      let imagePrompts: string[] = [];
-      if (includeImages) {
-        logger.info(`[Phase 7] Visual Content Generation`);
-        imagePrompts = await this.visualAgent(topic, verified.content, persona);
-      }
+      // Phase 7: Visual Content & Engagement Prediction (Parallel)
+      logger.info(`[Phase 7] Visual Content & Engagement Prediction`);
 
-      // Phase 8: Timing Optimization
-      logger.info(`[Phase 8] Timing Optimization`);
-      const bestPostingTime = await this.timingAgent(targetAudience);
-
-      // Phase 9: Final Engagement Prediction
-      const engagementData = await this.engagementPredictorAgent(verified.content, contentType, hookSuggestions);
+      const [imagePrompts, engagementData] = await Promise.all([
+        includeImages
+          ? this.visualAgent(topic, verified.content, persona)
+          : Promise.resolve([]),
+        this.engagementPredictorAgent(verified.content, contentType, hookSuggestions)
+      ]);
 
       return {
         title: verified.title,

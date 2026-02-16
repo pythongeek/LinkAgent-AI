@@ -1,9 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { contentApi } from '../services/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, BarChart3, ExternalLink } from 'lucide-react';
+import { FileText, Calendar, BarChart3, Copy } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function ContentHistory() {
   const { data: contents, isLoading } = useQuery({
@@ -61,9 +68,24 @@ export default function ContentHistory() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            navigator.clipboard.writeText(content.body);
+                            toast.success('Content copied to clipboard');
+                          }}
+                          aria-label="Copy content"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy content</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </CardContent>
@@ -79,7 +101,7 @@ export default function ContentHistory() {
               Start creating content in the Content Studio
             </p>
             <Button asChild>
-              <a href="/content/studio">Create Content</a>
+              <Link to="/content/studio">Create Content</Link>
             </Button>
           </CardContent>
         </Card>

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
-import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb, TrendingUp, Search, Target, Clock, BarChart3, RefreshCw } from 'lucide-react';
+import { Loader2, Sparkles, Wand2, BookOpen, Lightbulb, TrendingUp, Search, Target, Clock, BarChart3, RefreshCw, Check } from 'lucide-react';
 
 const contentTypes = [
   { value: 'post', label: 'LinkedIn Post', icon: Sparkles },
@@ -32,6 +32,7 @@ export default function ContentStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedHook, setSelectedHook] = useState<string>('');
   const [activeTab, setActiveTab] = useState('content');
+  const [isCopied, setIsCopied] = useState(false);
 
   const { data: personas } = useQuery({
     queryKey: ['personas'],
@@ -283,8 +284,24 @@ export default function ContentStudio() {
                   />
 
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" onClick={() => navigator.clipboard.writeText(generatedContent.content)}>
-                      Copy to Clipboard
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedContent.content);
+                        toast.success('Content copied to clipboard');
+                        setIsCopied(true);
+                        setTimeout(() => setIsCopied(false), 2000);
+                      }}
+                    >
+                      {isCopied ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        'Copy to Clipboard'
+                      )}
                     </Button>
                     <Button className="flex-1">Save to Library</Button>
                   </div>
@@ -301,12 +318,14 @@ export default function ContentStudio() {
                   
                   <div className="space-y-3">
                     {generatedContent.hookSuggestions?.map((hook: string, i: number) => (
-                      <div
+                      <button
                         key={i}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                        type="button"
+                        className={`w-full text-left p-4 rounded-lg border-2 cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                           selectedHook === hook ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
                         }`}
                         onClick={() => setSelectedHook(hook)}
+                        aria-pressed={selectedHook === hook}
                       >
                         <div className="flex items-start gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -316,7 +335,7 @@ export default function ContentStudio() {
                           </div>
                           <p className="text-sm flex-1">{hook}</p>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
 

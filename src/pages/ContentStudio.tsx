@@ -301,12 +301,14 @@ export default function ContentStudio() {
                   
                   <div className="space-y-3">
                     {generatedContent.hookSuggestions?.map((hook: string, i: number) => (
-                      <div
+                      <button
                         key={i}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                        type="button"
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                           selectedHook === hook ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
                         }`}
                         onClick={() => setSelectedHook(hook)}
+                        aria-pressed={selectedHook === hook}
                       >
                         <div className="flex items-start gap-3">
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -316,7 +318,7 @@ export default function ContentStudio() {
                           </div>
                           <p className="text-sm flex-1">{hook}</p>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
 

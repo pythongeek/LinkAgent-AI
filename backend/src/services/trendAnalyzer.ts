@@ -61,25 +61,31 @@ export class TrendAnalyzer {
     geo: string = 'US'
   ): Promise<TrendData> {
     try {
-      // Get interest over time
-      const interestData = await googleTrends.interestOverTime({
-        keyword,
-        startTime: this.parseTimeframe(timeframe),
-        geo,
-      });
+      // ⚡ Bolt: Fetch all trend data in parallel for better performance
+      const [interestData, relatedData, regionalData] = await Promise.all([
+        googleTrends.interestOverTime({
+          keyword,
+          startTime: this.parseTimeframe(timeframe),
+          geo,
+        }),
+        googleTrends.relatedQueries({
+          keyword,
+          startTime: this.parseTimeframe(timeframe),
+          geo,
+        }),
+        googleTrends.interestByRegion({
+          keyword,
+          startTime: this.parseTimeframe(timeframe),
+          geo,
+          resolution: 'COUNTRY',
+        }),
+      ]);
 
       const interestParsed = JSON.parse(interestData);
       const interestOverTime = interestParsed.default.timelineData.map((item: any) => ({
         date: item.formattedTime,
         value: item.value[0],
       }));
-
-      // Get related queries
-      const relatedData = await googleTrends.relatedQueries({
-        keyword,
-        startTime: this.parseTimeframe(timeframe),
-        geo,
-      });
 
       const relatedParsed = JSON.parse(relatedData);
       const relatedQueries = {
@@ -96,14 +102,6 @@ export class TrendAnalyzer {
             value: item.value,
           })),
       };
-
-      // Get regional interest
-      const regionalData = await googleTrends.interestByRegion({
-        keyword,
-        startTime: this.parseTimeframe(timeframe),
-        geo,
-        resolution: 'COUNTRY',
-      });
 
       const regionalParsed = JSON.parse(regionalData);
       const regionalInterest = (regionalParsed.default.geoMapData || [])

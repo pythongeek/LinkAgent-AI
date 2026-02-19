@@ -1,8 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { contentApi } from '../services/api';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { FileText, Calendar, BarChart3, ExternalLink } from 'lucide-react';
 
 export default function ContentHistory() {
@@ -61,9 +67,16 @@ export default function ContentHistory() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" aria-label="View details">
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>View details</p>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
               </CardContent>
@@ -79,7 +92,7 @@ export default function ContentHistory() {
               Start creating content in the Content Studio
             </p>
             <Button asChild>
-              <a href="/content/studio">Create Content</a>
+              <Link to="/content/studio">Create Content</Link>
             </Button>
           </CardContent>
         </Card>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   FileText,
   TrendingUp,
@@ -17,17 +18,17 @@ import {
 } from 'lucide-react';
 
 export default function Dashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['userStats'],
     queryFn: () => userApi.getStats().then((res) => res.data.stats),
   });
 
-  const { data: recentContent } = useQuery({
+  const { data: recentContent, isLoading: contentLoading } = useQuery({
     queryKey: ['recentContent'],
     queryFn: () => contentApi.getAll({ limit: 5 }).then((res) => res.data.contents),
   });
 
-  const { data: opportunities } = useQuery({
+  const { data: opportunities, isLoading: trendsLoading } = useQuery({
     queryKey: ['opportunities'],
     queryFn: () => trendApi.getOpportunities().then((res) => res.data.topics?.slice(0, 5) || []),
   });
@@ -85,21 +86,35 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statsCards.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {statsLoading
+          ? [...Array(4)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-8 w-16" />
+                    </div>
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          : statsCards.map((stat) => (
+              <Card key={stat.title}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                      <p className="text-3xl font-bold">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
       </div>
 
       {/* Main Content Grid */}
@@ -196,31 +211,51 @@ export default function Dashboard() {
             <CardDescription>High-opportunity topics to explore</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {opportunities?.length > 0 ? (
-              opportunities.map((topic: any) => (
-                <div key={topic.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium capitalize">{topic.keyword}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Progress value={topic.opportunityScore} className="w-20 h-2" />
-                      <span className="text-xs text-muted-foreground">
-                        {Math.round(topic.opportunityScore)}/100
-                      </span>
+            {trendsLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-2 w-20" />
                     </div>
+                    <Skeleton className="h-6 w-16 rounded-full" />
                   </div>
-                  <Badge variant={topic.opportunityScore >= 70 ? 'default' : 'secondary'}>
-                    {topic.opportunityScore >= 70 ? 'Hot' : 'Good'}
-                  </Badge>
-                </div>
-              ))
+                ))}
+                <Skeleton className="h-10 w-full mt-4" />
+              </div>
+            ) : opportunities?.length > 0 ? (
+              <>
+                {opportunities.map((topic: any) => (
+                  <div key={topic.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium capitalize">{topic.keyword}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Progress value={topic.opportunityScore} className="w-20 h-2" />
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(topic.opportunityScore)}/100
+                        </span>
+                      </div>
+                    </div>
+                    <Badge variant={topic.opportunityScore >= 70 ? 'default' : 'secondary'}>
+                      {topic.opportunityScore >= 70 ? 'Hot' : 'Good'}
+                    </Badge>
+                  </div>
+                ))}
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/trends">View All Opportunities</Link>
+                </Button>
+              </>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                No opportunities yet. Start researching trends!
-              </p>
+              <>
+                <p className="text-sm text-muted-foreground">
+                  No opportunities yet. Start researching trends!
+                </p>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/trends">View All Opportunities</Link>
+                </Button>
+              </>
             )}
-            <Button variant="outline" className="w-full" asChild>
-              <Link to="/trends">View All Opportunities</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -237,7 +272,25 @@ export default function Dashboard() {
           </Button>
         </CardHeader>
         <CardContent>
-          {recentContent?.length > 0 ? (
+          {contentLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                      <Skeleton className="h-5 w-24" />
+                    </div>
+                    <Skeleton className="h-4 w-48" />
+                  </div>
+                  <div className="flex gap-2">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-8 w-16" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : recentContent?.length > 0 ? (
             <div className="space-y-4">
               {recentContent.map((content: any) => (
                 <div

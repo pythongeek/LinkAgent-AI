@@ -3,8 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
+import { prisma } from './utils/prisma';
 import cron from 'node-cron';
 
 // Import routes
@@ -34,9 +34,7 @@ const PORT = process.env.PORT || 3001;
 app.set('trust proxy', 1);
 
 // Initialize Prisma
-export const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-});
+export { prisma };
 
 // Run database migrations on startup (for Vercel serverless)
 async function runMigrations() {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma } from '../server';
+import { prisma } from '../utils/prisma';
 import { authenticate } from '../middleware/auth';
 import { logger } from '../utils/logger';
 

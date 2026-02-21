@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
@@ -5,20 +6,19 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layouts
-// Layouts
 import DashboardLayout from './layouts/DashboardLayout';
 
 // Pages
-import Dashboard from './pages/Dashboard';
-import Personas from './pages/Personas';
-import PersonaCreate from './pages/PersonaCreate';
-import ContentStudio from './pages/ContentStudio';
-import ContentHistory from './pages/ContentHistory';
-import TrendExplorer from './pages/TrendExplorer';
-import CompetitorAnalysis from './pages/CompetitorAnalysis';
-import ProfileAudit from './pages/ProfileAudit';
-import Settings from './pages/Settings';
-import ImageGenerator from './pages/ImageGenerator';
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Personas = lazy(() => import('./pages/Personas'));
+const PersonaCreate = lazy(() => import('./pages/PersonaCreate'));
+const ContentStudio = lazy(() => import('./pages/ContentStudio'));
+const ContentHistory = lazy(() => import('./pages/ContentHistory'));
+const TrendExplorer = lazy(() => import('./pages/TrendExplorer'));
+const CompetitorAnalysis = lazy(() => import('./pages/CompetitorAnalysis'));
+const ProfileAudit = lazy(() => import('./pages/ProfileAudit'));
+const Settings = lazy(() => import('./pages/Settings'));
+const ImageGenerator = lazy(() => import('./pages/ImageGenerator'));
 
 const queryClient = new QueryClient({
   defaultOptions: {

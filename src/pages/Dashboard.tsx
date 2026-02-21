@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { Content } from '@/types';
 import {
   FileText,
   TrendingUp,
@@ -16,18 +18,24 @@ import {
   Zap,
 } from 'lucide-react';
 
+interface Opportunity {
+  id: string;
+  keyword: string;
+  opportunityScore: number;
+}
+
 export default function Dashboard() {
-  const { data: stats } = useQuery({
+  const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: ['userStats'],
     queryFn: () => userApi.getStats().then((res) => res.data.stats),
   });
 
-  const { data: recentContent } = useQuery({
+  const { data: recentContent, isLoading: isLoadingContent } = useQuery({
     queryKey: ['recentContent'],
     queryFn: () => contentApi.getAll({ limit: 5 }).then((res) => res.data.contents),
   });
 
-  const { data: opportunities } = useQuery({
+  const { data: opportunities, isLoading: isLoadingOpportunities } = useQuery({
     queryKey: ['opportunities'],
     queryFn: () => trendApi.getOpportunities().then((res) => res.data.topics?.slice(0, 5) || []),
   });
@@ -85,21 +93,35 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statsCards.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-3xl font-bold">{stat.value}</p>
-                </div>
-                <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-6 w-6 ${stat.color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {isLoadingStats
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-8 w-12" />
+                    </div>
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          : statsCards.map((stat) => (
+              <Card key={stat.title}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                      <p className="text-3xl font-bold">{stat.value}</p>
+                    </div>
+                    <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                      <stat.icon className={`h-6 w-6 ${stat.color}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
       </div>
 
       {/* Main Content Grid */}
@@ -196,8 +218,18 @@ export default function Dashboard() {
             <CardDescription>High-opportunity topics to explore</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {opportunities?.length > 0 ? (
-              opportunities.map((topic: any) => (
+            {isLoadingOpportunities ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-2 w-24" />
+                  </div>
+                  <Skeleton className="h-5 w-12 rounded-full" />
+                </div>
+              ))
+            ) : opportunities?.length > 0 ? (
+              opportunities.map((topic: Opportunity) => (
                 <div key={topic.id} className="flex items-center justify-between">
                   <div>
                     <p className="font-medium capitalize">{topic.keyword}</p>
@@ -237,9 +269,27 @@ export default function Dashboard() {
           </Button>
         </CardHeader>
         <CardContent>
-          {recentContent?.length > 0 ? (
+          {isLoadingContent ? (
             <div className="space-y-4">
-              {recentContent.map((content: any) => (
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between p-4 rounded-lg border">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-4 w-24" />
+                    </div>
+                    <Skeleton className="h-5 w-64" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                    <Skeleton className="h-8 w-16 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : recentContent?.length > 0 ? (
+            <div className="space-y-4">
+              {recentContent.map((content: Content) => (
                 <div
                   key={content.id}
                   className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors"

@@ -25,7 +25,11 @@ const PORT = process.env.PORT || 3002;
 app.use(express.json());
 
 // Encryption helper
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+
+if (!ENCRYPTION_KEY) {
+  throw new Error('ENCRYPTION_KEY environment variable is required for secure data handling');
+}
 
 function decrypt(encryptedData) {
   const bytes = crypto.AES.decrypt(encryptedData, ENCRYPTION_KEY);

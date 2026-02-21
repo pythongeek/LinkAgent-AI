@@ -1,9 +1,9 @@
 import CryptoJS from 'crypto-js';
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || '';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
-if (!ENCRYPTION_KEY && process.env.NODE_ENV === 'production') {
-  throw new Error('ENCRYPTION_KEY is required in production');
+if (!ENCRYPTION_KEY) {
+  throw new Error('ENCRYPTION_KEY environment variable is required for secure data handling');
 }
 
 export class Encryption {

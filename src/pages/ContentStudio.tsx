@@ -283,7 +283,15 @@ export default function ContentStudio() {
                   />
 
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" onClick={() => navigator.clipboard.writeText(generatedContent.content)}>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        navigator.clipboard.writeText(generatedContent.content)
+                          .then(() => toast.success('Copied to clipboard!'))
+                          .catch(() => toast.error('Failed to copy to clipboard'));
+                      }}
+                    >
                       Copy to Clipboard
                     </Button>
                     <Button className="flex-1">Save to Library</Button>
@@ -301,9 +309,11 @@ export default function ContentStudio() {
                   
                   <div className="space-y-3">
                     {generatedContent.hookSuggestions?.map((hook: string, i: number) => (
-                      <div
+                      <button
                         key={i}
-                        className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                        type="button"
+                        aria-pressed={selectedHook === hook}
+                        className={`w-full text-left p-4 rounded-lg border-2 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus:outline-none ${
                           selectedHook === hook ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
                         }`}
                         onClick={() => setSelectedHook(hook)}
@@ -316,7 +326,7 @@ export default function ContentStudio() {
                           </div>
                           <p className="text-sm flex-1">{hook}</p>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
 

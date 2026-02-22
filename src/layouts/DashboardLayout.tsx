@@ -1,6 +1,8 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Suspense } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { PageLoader } from '@/components/PageLoader';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -155,7 +157,9 @@ export default function DashboardLayout() {
 
         {/* Page Content */}
         <main className="p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          <Suspense fallback={<PageLoader />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
